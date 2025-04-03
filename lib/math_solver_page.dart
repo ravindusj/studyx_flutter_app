@@ -1,9 +1,5 @@
 import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter/services.dart';
-import '../services/math_solver_service.dart';
-import '../services/text_recognition_service.dart';
+
 
 class MathSolverPage extends StatefulWidget {
   const MathSolverPage({Key? key}) : super(key: key);
@@ -24,12 +20,10 @@ class _MathSolverPageState extends State<MathSolverPage> {
   int _retryCount = 0;
   String _detectedEquationType = '';
 
-  // Create instances of our services
   final MathSolverService _mathSolverService = MathSolverService();
   final TextRecognitionService _textRecognitionService =
       TextRecognitionService();
 
-  // Working example equations
   final List<String> _exampleEquations = [
     '2x + 5 = 15',
     'x^2 - 4 = 0',
@@ -52,7 +46,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
         });
       }
 
-      // Clear detected type when equation changes
       _updateDetectedEquationType();
     });
   }
@@ -128,7 +121,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
 
         _updateDetectedEquationType();
 
-        // Automatically solve the equation
         await _solveEquation();
       } else {
         setState(() {
