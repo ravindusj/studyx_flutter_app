@@ -24,10 +24,12 @@ class _MathSolverPageState extends State<MathSolverPage> {
   int _retryCount = 0;
   String _detectedEquationType = '';
 
+  // Create instances of our services
   final MathSolverService _mathSolverService = MathSolverService();
   final TextRecognitionService _textRecognitionService =
       TextRecognitionService();
 
+  // Working example equations
   final List<String> _exampleEquations = [
     '2x + 5 = 15',
     'x^2 - 4 = 0',
@@ -50,6 +52,7 @@ class _MathSolverPageState extends State<MathSolverPage> {
         });
       }
 
+      // Clear detected type when equation changes
       _updateDetectedEquationType();
     });
   }
@@ -125,6 +128,7 @@ class _MathSolverPageState extends State<MathSolverPage> {
 
         _updateDetectedEquationType();
 
+        // Automatically solve the equation
         await _solveEquation();
       } else {
         setState(() {
@@ -251,6 +255,22 @@ class _MathSolverPageState extends State<MathSolverPage> {
         ),
         actions: [
           TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final accentColor = Theme.of(context).colorScheme.tertiary;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      body: SafeArea(
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
           ),
