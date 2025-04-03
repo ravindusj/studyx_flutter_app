@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "586254831344",
+    "project_id": "studyx-app-74d6f",
+    "storage_bucket": "studyx-app-74d6f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:586254831344:android:19c9b0e5376a34e82dbc35",
+        "android_client_info": {
+          "package_name": "com.nsbm.studyx"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmVnl8e5CWdvFssG6XQdMDSjHXLoG_0B0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
