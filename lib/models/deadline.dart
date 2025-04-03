@@ -58,7 +58,6 @@ extension DeadlinePriorityExtension on DeadlinePriority {
     }
   }
   
-  // Get an icon for the priority
   IconData get icon {
     switch (this) {
       case DeadlinePriority.low:
