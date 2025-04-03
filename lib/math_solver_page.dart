@@ -267,22 +267,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
 
     return Scaffold(
       body: SafeArea(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final primaryColor = Theme.of(context).colorScheme.primary;
-    final accentColor = Theme.of(context).colorScheme.tertiary;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
-    return Scaffold(
-      body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -319,10 +303,8 @@ class _MathSolverPageState extends State<MathSolverPage> {
                       setState(() {});
                       _updateDetectedEquationType();
                     },
-                    onSubmitted: (_) =>
-                        _solveEquation(),
+                    onSubmitted: (_) => _solveEquation(),
                   ),
-
                   if (_detectedEquationType.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Container(
@@ -355,7 +337,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                   ],
                 ],
               ),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -386,7 +367,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                       ],
                     ),
                   ),
-
                   Flexible(
                     child: Text(
                       'Equation type will be detected automatically',
@@ -400,9 +380,7 @@ class _MathSolverPageState extends State<MathSolverPage> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 8),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -440,17 +418,14 @@ class _MathSolverPageState extends State<MathSolverPage> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 12),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -478,7 +453,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                         ),
                 ),
               ),
-
               if (_processingStatus.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Center(
@@ -497,9 +471,7 @@ class _MathSolverPageState extends State<MathSolverPage> {
                   ),
                 ),
               ],
-
               const SizedBox(height: 10),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -555,8 +527,7 @@ class _MathSolverPageState extends State<MathSolverPage> {
                                         color: Colors.grey[600],
                                       ),
                                     ),
-                                    const SizedBox(
-                                        height: 2),
+                                    const SizedBox(height: 2),
                                     Text(
                                       _equationController.text,
                                       style: const TextStyle(
@@ -575,11 +546,9 @@ class _MathSolverPageState extends State<MathSolverPage> {
                       Divider(
                           height: 12, thickness: 0.5, color: Colors.grey[300]),
                     ],
-
                     if (_solution.isNotEmpty) ...[
                       Padding(
-                        padding: const EdgeInsets.only(
-                            top: 2, bottom: 4),
+                        padding: const EdgeInsets.only(top: 2, bottom: 4),
                         child: Row(
                           children: [
                             Text(
@@ -650,10 +619,8 @@ class _MathSolverPageState extends State<MathSolverPage> {
                             child: Text(
                               _solution,
                               style: TextStyle(
-                                fontSize:
-                                    16.5,
-                                height:
-                                    1.5,
+                                fontSize: 16.5,
+                                height: 1.5,
                                 color:
                                     isDarkMode ? Colors.white : Colors.black87,
                               ),
@@ -662,7 +629,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                         ),
                       ),
                     ],
-
                     if (_isLoading &&
                         _solution.isEmpty &&
                         !_isProcessingImage &&
@@ -683,7 +649,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                       ),
                       const Spacer(),
                     ],
-
                     if (!_isLoading &&
                         _solution.isEmpty &&
                         !_isProcessingImage &&
