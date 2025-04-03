@@ -78,7 +78,190 @@ class _AiToolsPageState extends State<AiToolsPage> with SingleTickerProviderStat
     }
   }
 
-  
+  Future<void> _summarizeYouTube() async {
+    if (_urlController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a YouTube URL')),
+      );
+      return;
+    }
+
+    final youtubeUrl = _urlController.text;
+    if (!youtubeUrl.contains('youtube.com') && !youtubeUrl.contains('youtu.be')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid YouTube URL')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _youTubeSummaryResult = '';
+    });
+
+    try {
+      final videoInfoFuture = _fetchYouTubeVideoInfo(_urlController.text);
+      final transcriptFuture = _extractYouTubeTranscript(_urlController.text);
+      
+      final videoInfo = await videoInfoFuture;
+      String? transcript = await transcriptFuture;
+      
+      String prompt;
+      
+      if (transcript == null || transcript.isEmpty) {
+        if (videoInfo.title.isNotEmpty) {
+          prompt = """
+          I want information about this YouTube video:
+          
+          Title: ${videoInfo.title}
+          Channel: ${videoInfo.channelName}
+          ${videoInfo.viewCount.isNotEmpty ? "Views: ${videoInfo.viewCount}" : ""}
+          ${videoInfo.uploadDate.isNotEmpty ? "Upload date: ${videoInfo.uploadDate}" : ""}
+          
+          I understand you can't watch this video directly. Based only on the title and channel information (not making assumptions about content):
+          
+          1. What topics might this video cover?
+          2. What would be the best way for me to summarize this video myself after watching it?
+          3. What key elements should I look for based on the title?
+          
+          Please be very clear that your response is based ONLY on the video metadata, not the actual content.
+          """;
+        } else {
+          prompt = """
+          I want to summarize the YouTube video at: ${_urlController.text}
+          
+          As an AI language model, I cannot directly access or watch YouTube videos, and I wasn't able to retrieve the title, channel or transcript for this video.
+          
+          Please provide:
+          1. A clear explanation that you cannot access the video content
+          2. General advice on how I could summarize the video myself
+          3. What key elements to look for when watching any video to create a good summary
+          
+          Please be completely honest about your limitations.
+          """;
+        }
+      } else {
+        prompt = """
+        Please summarize this YouTube video based on its transcript:
+        
+        Video Title: ${videoInfo.title}
+        Channel: ${videoInfo.channelName}
+        ${videoInfo.viewCount.isNotEmpty ? "Views: ${videoInfo.viewCount}" : ""}
+        ${videoInfo.uploadDate.isNotEmpty ? "Upload date: ${videoInfo.uploadDate}" : ""}
+        
+        Transcript:
+        $transcript
+        
+        Please provide a concise summary highlighting the main points and key takeaways from the transcript.
+        Format your response with clear sections: Introduction, Main Points, and Conclusion.
+        """;
+      }
+      
+      final summary = await _callGeminiApi(prompt);
+      
+      setState(() {
+        _youTubeSummaryResult = summary;
+        _videoInfo = videoInfo;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _youTubeSummaryResult = 'Error: ${e.toString()}';
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to summarize video: ${e.toString()}'),
+          backgroundColor: Colors.red.shade700,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+
+  Future<void> _pickPDF() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
+
+      if (result != null) {
+        setState(() {
+          _selectedPdfPath = result.files.single.path;
+          _pdfText = '';
+          _pdfSummaryResult = '';
+        });
+        await _extractTextFromPDF();
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error picking PDF: ${e.toString()}')),
+      );
+    }
+  }
+
+  Future<void> _extractTextFromPDF() async {
+    if (_selectedPdfPath == null) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      PdfDocument document = PdfDocument(inputBytes: File(_selectedPdfPath!).readAsBytesSync());
+      
+      String text = PdfTextExtractor(document).extractText();
+      
+      text = text.replaceAll('\n\n', '\n').trim();
+      
+      setState(() {
+        _pdfText = text;
+        _isLoading = false;
+      });
+      
+      document.dispose();
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _pdfText = 'Error extracting text: ${e.toString()}';
+      });
+    }
+  }
+
+  Future<void> _summarizePDF() async {
+    if (_pdfText.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a PDF first')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+      _pdfSummaryResult = '';
+    });
+
+    try {
+      final String textToSummarize = _pdfText.length > 5000 ? 
+                                     '${_pdfText.substring(0, 5000)}...' : 
+                                     _pdfText;
+      
+      final prompt = "Summarize the following text from a PDF document:\n\n$textToSummarize";
+      final summary = await _callGeminiApi(prompt);
+      
+      setState(() {
+        _pdfSummaryResult = summary;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _pdfSummaryResult = 'Error: ${e.toString()}';
+      });
+    }
+  }
 
   Future<String> _callGeminiApi(String prompt) async {
     const String baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
@@ -157,6 +340,275 @@ class _AiToolsPageState extends State<AiToolsPage> with SingleTickerProviderStat
         return 'Request timed out. Please try again.';
       }
       return 'Error: ${e.toString()}';
+    }
+  }
+
+  Future<_YouTubeVideoInfo> _fetchYouTubeVideoInfo(String videoUrl) async {
+    print('Fetching video info for: $videoUrl');
+    
+    String videoTitle = '';
+    String channelName = '';
+    String viewCount = '';
+    String uploadDate = '';
+    
+    try {
+      String? videoId;
+      if (videoUrl.contains('youtube.com/watch?v=')) {
+        videoId = Uri.parse(videoUrl).queryParameters['v'];
+      } else if (videoUrl.contains('youtu.be/')) {
+        final pathSegments = Uri.parse(videoUrl).pathSegments;
+        if (pathSegments.isNotEmpty) {
+          videoId = pathSegments.last;
+        }
+      }
+      
+      if (videoId == null) {
+        print('Could not extract video ID from URL');
+        return _YouTubeVideoInfo.empty();
+      }
+      
+      print('Extracted video ID: $videoId');
+      
+      try {
+        final oembedUrl = 'https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=$videoId&format=json';
+        
+        print('Trying oEmbed API: $oembedUrl');
+        
+        final oembedResponse = await http.get(
+          Uri.parse(oembedUrl),
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'Accept': 'application/json',
+          },
+        );
+        
+        if (oembedResponse.statusCode == 200) {
+          print('oEmbed API successful');
+          final data = jsonDecode(oembedResponse.body);
+          videoTitle = data['title'] ?? '';
+          channelName = data['author_name'] ?? '';
+          
+          print('oEmbed data - Title: $videoTitle, Channel: $channelName');
+          
+          try {
+            final invidiousUrl = 'https://invidious.projectsegfau.lt/api/v1/videos/$videoId';
+            final invidiousResponse = await http.get(
+              Uri.parse(invidiousUrl),
+              headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept': 'application/json',
+              },
+            ).timeout(const Duration(seconds: 5)); 
+            
+            if (invidiousResponse.statusCode == 200) {
+              final invidiousData = jsonDecode(invidiousResponse.body);
+              final viewCountRaw = invidiousData['viewCount'];
+              if (viewCountRaw != null) {
+                try {
+                  final count = int.parse(viewCountRaw.toString());
+                  viewCount = _formatViewCount(count);
+                  print('Extracted view count from Invidious: $viewCount');
+                } catch (e) {
+                  print('Error parsing view count from Invidious: $e');
+                }
+              }
+              
+              final publishedText = invidiousData['publishedText'];
+              if (publishedText != null) {
+                uploadDate = publishedText.toString();
+                print('Extracted upload date from Invidious: $uploadDate');
+              }
+            }
+          } catch (e) {
+            print('Error with Invidious API, will try fallback method: $e');
+          }
+        } else {
+          print('oEmbed API failed: ${oembedResponse.statusCode}');
+        }
+      } catch (e) {
+        print('Error with oEmbed API: $e');
+      }
+      
+      if (videoTitle.isNotEmpty && viewCount.isEmpty) {
+        viewCount = 'View count unavailable';
+      }
+      
+      if (videoTitle.isNotEmpty && uploadDate.isEmpty) {
+        uploadDate = 'Upload date unavailable';
+      }
+      
+      print('Returning video info - Title: $videoTitle, Channel: $channelName, Views: $viewCount, Date: $uploadDate');
+      return _YouTubeVideoInfo(
+        title: videoTitle,
+        uploadDate: uploadDate,
+        viewCount: viewCount,
+        channelName: channelName,
+      );
+    } catch (e) {
+      print('Error in YouTube info extraction: $e');
+      return _YouTubeVideoInfo.empty();
+    }
+  }
+
+  String _formatViewCount(int viewCount) {
+    if (viewCount >= 1000000) {
+      return '${(viewCount / 1000000).toStringAsFixed(1)}M views';
+    } else if (viewCount >= 1000) {
+      return '${(viewCount / 1000).toStringAsFixed(1)}K views';
+    } else {
+      return '$viewCount views';
+    }
+  }
+  
+  String _formatUploadDate(String dateString) {
+    try {
+      final date = DateTime.parse(dateString);
+      return '${date.day}/${date.month}/${date.year}';
+    } catch (e) {
+      return dateString;
+    }
+  }
+  
+  Future<void> _launchYouTubeVideo(String videoUrl) async {
+    final Uri url = Uri.parse(videoUrl);
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Could not open the video')),
+        );
+      }
+    }
+  }
+
+  Future<String?> _extractYouTubeTranscript(String videoUrl) async {
+    try {
+      String? videoId;
+      if (videoUrl.contains('youtube.com/watch?v=')) {
+        videoId = Uri.parse(videoUrl).queryParameters['v'];
+      } else if (videoUrl.contains('youtu.be/')) {
+        final pathSegments = Uri.parse(videoUrl).pathSegments;
+        if (pathSegments.isNotEmpty) {
+          videoId = pathSegments.last;
+        }
+      }
+      
+      if (videoId == null) {
+        return null;
+      }
+      
+            try {
+        final invidiousUrl = 'https://invidious.projectsegfau.lt/api/v1/captions/$videoId?lang=en';
+        final response = await http.get(
+          Uri.parse(invidiousUrl),
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': 'application/json',
+          },
+        ).timeout(const Duration(seconds: 5));
+        
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          if (data is List && data.isNotEmpty) {
+            final captionItem = data.firstWhere(
+              (item) => item['languageCode'] == 'en',
+              orElse: () => data.first,
+            );
+            
+            if (captionItem != null && captionItem['url'] != null) {
+              final captionUrl = captionItem['url'];
+              final captionResponse = await http.get(Uri.parse(captionUrl));
+              
+              if (captionResponse.statusCode == 200) {
+                final content = captionResponse.body;
+                
+                if (content.contains('<text ')) {
+                  final document = dom.Document.html(content);
+                  final textElements = document.querySelectorAll('text');
+                  final transcriptParts = textElements.map((element) => element.text).toList();
+                  return transcriptParts.join(' ');
+                } else if (content.contains('"text":')) {
+                  try {
+                    final jsonData = jsonDecode(content);
+                    if (jsonData['events'] != null) {
+                      final List<dynamic> events = jsonData['events'];
+                      final texts = events
+                          .where((event) => event['segs'] != null)
+                          .expand((event) => event['segs'])
+                          .where((seg) => seg['utf8'] != null)
+                          .map((seg) => seg['utf8'].toString())
+                          .toList();
+                      return texts.join(' ');
+                    }
+                  } catch (e) {
+                    print('Error parsing JSON transcript: $e');
+                  }
+                }
+              }
+            }
+          }
+        }
+      } catch (e) {
+        print('Error with Invidious captions API: $e');
+      }
+      
+      try {
+        final ytTranscriptUrl = 'https://yt-transcript-proxy.herokuapp.com/$videoId';
+        final response = await http.get(Uri.parse(ytTranscriptUrl))
+            .timeout(const Duration(seconds: 5));
+        
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          if (data['transcript'] != null) {
+            final transcript = data['transcript'] as List;
+            final texts = transcript
+                .map((item) => item['text'].toString())
+                .toList();
+            return texts.join(' ');
+          }
+        }
+      } catch (e) {
+        print('Error with transcript proxy API: $e');
+      }
+      
+      try {
+        final videoPageUrl = 'https://www.youtube.com/watch?v=$videoId&hl=en';
+        final pageResponse = await http.get(
+          Uri.parse(videoPageUrl),
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml',
+          },
+        );
+        
+        if (pageResponse.statusCode == 200) {
+          final html = pageResponse.body;
+          
+          final transcriptMatch = RegExp(r'"captionTracks":\[\{"baseUrl":"([^"]+)"').firstMatch(html);
+          
+          if (transcriptMatch != null && transcriptMatch.group(1) != null) {
+            final captionUrl = transcriptMatch.group(1)!.replaceAll('\\u0026', '&');
+            
+            final captionResponse = await http.get(Uri.parse(captionUrl));
+            if (captionResponse.statusCode == 200) {
+              final document = dom.Document.html(captionResponse.body);
+              final textElements = document.querySelectorAll('text');
+              
+              final transcriptParts = textElements.map((element) => element.text).toList();
+              return transcriptParts.join(' ');
+            }
+          }
+        }
+      } catch (e) {
+        print('Error scraping YouTube page for transcript: $e');
+      }
+      
+      print('No transcript found after trying all methods');
+      return null;
+    } catch (e) {
+      print('Error extracting transcript: $e');
+      return null;
     }
   }
 
@@ -1223,4 +1675,27 @@ class _AiToolsPageState extends State<AiToolsPage> with SingleTickerProviderStat
     return fileName;
   }
 
+}
+
+class _YouTubeVideoInfo {
+  final String title;
+  final String uploadDate;
+  final String viewCount;
+  final String channelName;
+
+  _YouTubeVideoInfo({
+    required this.title,
+    required this.uploadDate,
+    required this.viewCount,
+    required this.channelName,
+  });
+
+  factory _YouTubeVideoInfo.empty() {
+    return _YouTubeVideoInfo(
+      title: '',
+      uploadDate: '',
+      viewCount: '',
+      channelName: '',
+    );
+  }
 }
