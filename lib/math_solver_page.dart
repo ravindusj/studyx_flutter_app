@@ -24,12 +24,10 @@ class _MathSolverPageState extends State<MathSolverPage> {
   int _retryCount = 0;
   String _detectedEquationType = '';
 
-  // Create instances of our services
   final MathSolverService _mathSolverService = MathSolverService();
   final TextRecognitionService _textRecognitionService =
       TextRecognitionService();
 
-  // Working example equations
   final List<String> _exampleEquations = [
     '2x + 5 = 15',
     'x^2 - 4 = 0',
@@ -52,7 +50,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
         });
       }
 
-      // Clear detected type when equation changes
       _updateDetectedEquationType();
     });
   }
@@ -90,12 +87,11 @@ class _MathSolverPageState extends State<MathSolverPage> {
           _image = File(pickedFile.path);
           _isProcessingImage = true;
           _processingStatus = 'Analyzing image...';
-          _solution = ''; // Clear previous solution
-          _errorMessage = ''; // Clear any previous errors
-          _detectedEquationType = ''; // Clear detected type
+          _solution = '';
+          _errorMessage = '';
+          _detectedEquationType = '';
         });
 
-        // Process the image to extract text
         await _recognizeEquation();
       }
     } catch (e) {
@@ -117,7 +113,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
         _processingStatus = 'Recognizing equation...';
       });
 
-      // Use the text recognition service to extract the equation
       String extractedText =
           await _textRecognitionService.recognizeTextFromImage(_image!);
 
@@ -128,10 +123,8 @@ class _MathSolverPageState extends State<MathSolverPage> {
           _isProcessingImage = false;
         });
 
-        // Detect equation type
         _updateDetectedEquationType();
 
-        // Automatically solve the equation
         await _solveEquation();
       } else {
         setState(() {
@@ -173,11 +166,10 @@ class _MathSolverPageState extends State<MathSolverPage> {
       _isLoading = true;
       _solution = '';
       _processingStatus = 'Solving equation...';
-      _errorMessage = ''; // Clear any previous errors
+      _errorMessage = '';
     });
 
     try {
-      // Use the math solver service to solve the equation (auto-detection)
       String solution =
           await _mathSolverService.solveEquation(_equationController.text);
 
@@ -186,14 +178,13 @@ class _MathSolverPageState extends State<MathSolverPage> {
         _isLoading = false;
         _processingStatus = '';
 
-        // If the solution contains an error message, increment retry count
         if (solution.contains('Error:')) {
           _retryCount++;
           if (_retryCount > 1) {
             _showExampleSuggestion();
           }
         } else {
-          _retryCount = 0; // Reset retry count on success
+          _retryCount = 0;
         }
       });
     } catch (e) {
@@ -203,7 +194,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
         _isLoading = false;
         _processingStatus = '';
 
-        // If we've had multiple failures, suggest an example
         _retryCount++;
         if (_retryCount > 1) {
           _showExampleSuggestion();
@@ -212,7 +202,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
     }
   }
 
-  // Show a dialog with example equations
   void _showExampleSuggestion() {
     showDialog(
       context: context,
@@ -229,7 +218,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                 style: TextStyle(fontSize: 14),
               ),
               const SizedBox(height: 16),
-              // Show examples in a ListView to make it scrollable if needed
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 300),
                 child: ListView.builder(
@@ -240,7 +228,7 @@ class _MathSolverPageState extends State<MathSolverPage> {
                       onTap: () {
                         _equationController.text = _exampleEquations[index];
                         Navigator.pop(context);
-                        _updateDetectedEquationType(); // Update detected type
+                        _updateDetectedEquationType();
                         _solveEquation();
                       },
                       child: Container(
@@ -284,11 +272,9 @@ class _MathSolverPageState extends State<MathSolverPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Equation input with smart detection indicator
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Text field for equation input
                   TextField(
                     controller: _equationController,
                     decoration: InputDecoration(
@@ -314,14 +300,13 @@ class _MathSolverPageState extends State<MathSolverPage> {
                           _errorMessage.isNotEmpty ? _errorMessage : null,
                     ),
                     onChanged: (value) {
-                      setState(() {}); // To update the clear button visibility
+                      setState(() {});
                       _updateDetectedEquationType();
                     },
                     onSubmitted: (_) =>
-                        _solveEquation(), // Allow pressing enter to solve
+                        _solveEquation(),
                   ),
 
-                  // Type detection indicator if available
                   if (_detectedEquationType.isNotEmpty) ...[
                     const SizedBox(height: 4),
                     Container(
@@ -358,7 +343,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Examples hint button
                   TextButton(
                     onPressed: _showExampleSuggestion,
                     style: TextButton.styleFrom(
@@ -387,7 +371,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                     ),
                   ),
 
-                  // Help text explaining auto-detection
                   Flexible(
                     child: Text(
                       'Equation type will be detected automatically',
@@ -402,9 +385,8 @@ class _MathSolverPageState extends State<MathSolverPage> {
                 ],
               ),
 
-              const SizedBox(height: 8), // Reduced spacing
+              const SizedBox(height: 8),
 
-              // Camera and gallery buttons - now in a more compact row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -443,9 +425,8 @@ class _MathSolverPageState extends State<MathSolverPage> {
                 ],
               ),
 
-              const SizedBox(height: 12), // Reduced spacing
+              const SizedBox(height: 12),
 
-              // Solve button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -453,7 +434,7 @@ class _MathSolverPageState extends State<MathSolverPage> {
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                        vertical: 12), // Reduced height
+                        vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -482,7 +463,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                 ),
               ),
 
-              // Processing status indicator
               if (_processingStatus.isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Center(
@@ -504,12 +484,10 @@ class _MathSolverPageState extends State<MathSolverPage> {
 
               const SizedBox(height: 10),
 
-              // Create a container that will hold both image preview and solution
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Show image in a much smaller size if available - REDUCED HEIGHT
                     if (_image != null) ...[
                       Row(
                         children: [
@@ -521,7 +499,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                                     ),
                           ),
                           const Spacer(),
-                          // Add close button to remove image
                           IconButton(
                             icon: const Icon(Icons.close, size: 14),
                             onPressed: () {
@@ -535,22 +512,20 @@ class _MathSolverPageState extends State<MathSolverPage> {
                           ),
                         ],
                       ),
-                      // REDUCED HEIGHT - Made image preview much smaller
                       SizedBox(
-                        height: 70, // Reduced height from 100 to 70
+                        height: 70,
                         child: Row(
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
                               child: Image.file(
                                 _image!,
-                                height: 70, // Reduced height
-                                width: 90, // Reduced width from 120 to 90
+                                height: 70,
+                                width: 90,
                                 fit: BoxFit.cover,
                               ),
                             ),
-                            const SizedBox(width: 8), // Reduced spacing
-                            // Show detected equation alongside image
+                            const SizedBox(width: 8),
                             if (_equationController.text.isNotEmpty)
                               Expanded(
                                 child: Column(
@@ -560,17 +535,17 @@ class _MathSolverPageState extends State<MathSolverPage> {
                                     Text(
                                       'Detected:',
                                       style: TextStyle(
-                                        fontSize: 11, // Reduced from 12
+                                        fontSize: 11,
                                         color: Colors.grey[600],
                                       ),
                                     ),
                                     const SizedBox(
-                                        height: 2), // Reduced spacing
+                                        height: 2),
                                     Text(
                                       _equationController.text,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 14, // Reduced from 16
+                                        fontSize: 14,
                                       ),
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
@@ -581,16 +556,14 @@ class _MathSolverPageState extends State<MathSolverPage> {
                           ],
                         ),
                       ),
-                      // Thinner divider with less vertical space
                       Divider(
                           height: 12, thickness: 0.5, color: Colors.grey[300]),
                     ],
 
-                    // Solution area - takes MORE space now due to smaller image preview
                     if (_solution.isNotEmpty) ...[
                       Padding(
                         padding: const EdgeInsets.only(
-                            top: 2, bottom: 4), // Reduced padding
+                            top: 2, bottom: 4),
                         child: Row(
                           children: [
                             Text(
@@ -603,7 +576,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                                   ),
                             ),
                             const Spacer(),
-                            // Add a helper button to copy solution directly from header
                             InkWell(
                               onTap: () {
                                 Clipboard.setData(
@@ -644,7 +616,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                           ],
                         ),
                       ),
-                      // INCREASED size of solution container - takes more vertical space
                       Expanded(
                         child: Container(
                           width: double.infinity,
@@ -659,15 +630,14 @@ class _MathSolverPageState extends State<MathSolverPage> {
                               width: 1,
                             ),
                           ),
-                          // Improved solution text display with better formatting
                           child: SingleChildScrollView(
                             child: Text(
                               _solution,
                               style: TextStyle(
                                 fontSize:
-                                    16.5, // Slightly increased font size for better readability
+                                    16.5,
                                 height:
-                                    1.5, // Add line spacing for better readability
+                                    1.5,
                                 color:
                                     isDarkMode ? Colors.white : Colors.black87,
                               ),
@@ -675,12 +645,8 @@ class _MathSolverPageState extends State<MathSolverPage> {
                           ),
                         ),
                       ),
-
-                      // Removed the separate copy button since we added it to the header
-                      // This gives even more vertical space to the solution
                     ],
 
-                    // Show loading indicator when processing
                     if (_isLoading &&
                         _solution.isEmpty &&
                         !_isProcessingImage &&
@@ -702,7 +668,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                       const Spacer(),
                     ],
 
-                    // Show helper text if nothing is happening yet
                     if (!_isLoading &&
                         _solution.isEmpty &&
                         !_isProcessingImage &&
