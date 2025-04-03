@@ -23,13 +23,9 @@ class _MathSolverPageState extends State<MathSolverPage> {
   String _errorMessage = '';
   int _retryCount = 0;
   String _detectedEquationType = '';
-
-  // Create instances of our services
   final MathSolverService _mathSolverService = MathSolverService();
   final TextRecognitionService _textRecognitionService =
       TextRecognitionService();
-
-  // Working example equations
   final List<String> _exampleEquations = [
     '2x + 5 = 15',
     'x^2 - 4 = 0',
@@ -51,8 +47,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
           _errorMessage = '';
         });
       }
-
-      // Clear detected type when equation changes
       _updateDetectedEquationType();
     });
   }
@@ -90,12 +84,11 @@ class _MathSolverPageState extends State<MathSolverPage> {
           _image = File(pickedFile.path);
           _isProcessingImage = true;
           _processingStatus = 'Analyzing image...';
-          _solution = ''; // Clear previous solution
-          _errorMessage = ''; // Clear any previous errors
-          _detectedEquationType = ''; // Clear detected type
+          _solution = '';
+          _errorMessage = '';
+          _detectedEquationType = '';
         });
 
-        // Process the image to extract text
         await _recognizeEquation();
       }
     } catch (e) {
@@ -117,7 +110,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
         _processingStatus = 'Recognizing equation...';
       });
 
-      // Use the text recognition service to extract the equation
       String extractedText =
           await _textRecognitionService.recognizeTextFromImage(_image!);
 
@@ -128,10 +120,7 @@ class _MathSolverPageState extends State<MathSolverPage> {
           _isProcessingImage = false;
         });
 
-        // Detect equation type
         _updateDetectedEquationType();
-
-        // Automatically solve the equation
         await _solveEquation();
       } else {
         setState(() {
@@ -173,11 +162,10 @@ class _MathSolverPageState extends State<MathSolverPage> {
       _isLoading = true;
       _solution = '';
       _processingStatus = 'Solving equation...';
-      _errorMessage = ''; // Clear any previous errors
+      _errorMessage = '';
     });
 
     try {
-      // Use the math solver service to solve the equation (auto-detection)
       String solution =
           await _mathSolverService.solveEquation(_equationController.text);
 
@@ -186,14 +174,13 @@ class _MathSolverPageState extends State<MathSolverPage> {
         _isLoading = false;
         _processingStatus = '';
 
-        // If the solution contains an error message, increment retry count
         if (solution.contains('Error:')) {
           _retryCount++;
           if (_retryCount > 1) {
             _showExampleSuggestion();
           }
         } else {
-          _retryCount = 0; // Reset retry count on success
+          _retryCount = 0;
         }
       });
     } catch (e) {
@@ -203,7 +190,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
         _isLoading = false;
         _processingStatus = '';
 
-        // If we've had multiple failures, suggest an example
         _retryCount++;
         if (_retryCount > 1) {
           _showExampleSuggestion();
@@ -212,7 +198,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
     }
   }
 
-  // Show a dialog with example equations
   void _showExampleSuggestion() {
     showDialog(
       context: context,
@@ -229,7 +214,6 @@ class _MathSolverPageState extends State<MathSolverPage> {
                 style: TextStyle(fontSize: 14),
               ),
               const SizedBox(height: 16),
-              // Show examples in a ListView to make it scrollable if needed
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 300),
                 child: ListView.builder(
@@ -240,7 +224,7 @@ class _MathSolverPageState extends State<MathSolverPage> {
                       onTap: () {
                         _equationController.text = _exampleEquations[index];
                         Navigator.pop(context);
-                        _updateDetectedEquationType(); // Update detected type
+                        _updateDetectedEquationType();
                         _solveEquation();
                       },
                       child: Container(
@@ -263,6 +247,22 @@ class _MathSolverPageState extends State<MathSolverPage> {
         ),
         actions: [
           TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+    final accentColor = Theme.of(context).colorScheme.tertiary;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      body: SafeArea(
             onPressed: () => Navigator.pop(context),
             child: const Text('Close'),
           ),
