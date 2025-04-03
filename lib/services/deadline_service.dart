@@ -368,3 +368,168 @@ class DeadlineService extends ChangeNotifier {
     
     return recommended.toSet().toList();
   }
+
+
+  void scheduleReminders() {
+    for (final deadline in _deadlines) {
+      if (deadline.hasReminder && 
+          deadline.status != DeadlineStatus.completed) {
+        _scheduleRemindersForDeadline(deadline);
+      }
+    }
+  }
+
+  
+  void _scheduleRemindersForDeadline(Deadline deadline) {
+    if (!deadline.hasReminder || deadline.status == DeadlineStatus.completed) {
+      return;
+    }
+    
+    final now = DateTime.now();
+    
+   
+    if (deadline.isOverdue) {
+      return;
+    }
+    
+  
+    if (deadline.reminderTimes.isEmpty) {
+     
+      final List<DateTime> reminderTimes = [];
+      
+    
+      final oneDayBefore = deadline.dueDate.subtract(const Duration(days: 1));
+      if (oneDayBefore.isAfter(now)) {
+        reminderTimes.add(oneDayBefore);
+      }
+      
+    
+      final oneHourBefore = deadline.dueDate.subtract(const Duration(hours: 1));
+      if (oneHourBefore.isAfter(now)) {
+        reminderTimes.add(oneHourBefore);
+      }
+      
+     
+      _firestore.collection('deadlines').doc(deadline.id).update({
+        'reminderTimes': reminderTimes.map((dt) => Timestamp.fromDate(dt)).toList(),
+      });
+      
+  
+      _scheduleNotificationsForDeadline(deadline, reminderTimes);
+    } else {
+   
+      final validReminderTimes = deadline.reminderTimes.where((dt) => dt.isAfter(now)).toList();
+      _scheduleNotificationsForDeadline(deadline, validReminderTimes);
+    }
+  }
+
+
+  void _scheduleNotificationsForDeadline(Deadline deadline, List<DateTime> reminderTimes) {
+    for (final reminderTime in reminderTimes) {
+      final String title;
+      final String body;
+      
+     
+      final daysUntilDue = deadline.dueDate.difference(reminderTime).inDays;
+      
+      if (daysUntilDue == 0) {
+       
+        final hoursUntilDue = deadline.dueDate.difference(reminderTime).inHours;
+        title = 'Deadline Due Soon: ${deadline.title}';
+        body = 'Task due in $hoursUntilDue ${hoursUntilDue == 1 ? 'hour' : 'hours'}.';
+      } else if (daysUntilDue == 1) {
+       
+        title = 'Deadline Tomorrow: ${deadline.title}';
+        body = 'Don\'t forget your task due tomorrow!';
+      } else {
+       
+        title = 'Upcoming Deadline: ${deadline.title}';
+        body = 'Task due in $daysUntilDue days.';
+      }
+      
+     
+      final notificationDetails = NotificationDetails(
+        android: AndroidNotificationDetails(
+          'deadline_reminders',
+          'Deadline Reminders',
+          channelDescription: 'Notifications for deadline reminders',
+          importance: Importance.high,
+          priority: Priority.high,
+          color: deadline.priority.color,
+        ),
+        iOS: const DarwinNotificationDetails(
+          presentAlert: true,
+          presentBadge: true,
+          presentSound: true,
+        ),
+      );
+      
+    
+      _notificationService.scheduleNotification(
+        id: int.parse('${deadline.id.hashCode}${reminderTime.millisecondsSinceEpoch % 10000}'.substring(0, 9)), 
+        title: title,
+        body: body,
+        scheduledDate: reminderTime,
+        notificationDetails: notificationDetails,
+        payload: 'deadline:${deadline.id}',
+      );
+    }
+  }
+
+ 
+  void _cancelRemindersForDeadline(String deadlineId) {
+    
+    final baseId = deadlineId.hashCode;
+    
+    
+    for (int i = 0; i < 10; i++) {
+      final notificationId = int.parse('$baseId$i'.substring(0, 9));
+      _notificationService.cancelNotification(notificationId);
+    }
+  }
+
+  
+  Future<void> scheduleImmediateReminderForTesting(Deadline deadline) async {
+    final now = DateTime.now();
+    final timeUntilDeadline = deadline.dueDate.difference(now);
+    
+    
+    String timeMessage;
+    if (timeUntilDeadline.inHours <= 0) {
+      timeMessage = 'in ${timeUntilDeadline.inMinutes} minutes';
+    } else if (timeUntilDeadline.inHours < 24) {
+      timeMessage = 'in ${timeUntilDeadline.inHours} hours';
+    } else {
+      timeMessage = 'in ${timeUntilDeadline.inDays} days';
+    }
+    
+   
+    String notificationTitle;
+    String notificationBody;
+    
+    switch (deadline.priority) {
+      case DeadlinePriority.high:
+        notificationTitle = '⚠️ Urgent Deadline Approaching!';
+        notificationBody = '${deadline.title} is due $timeMessage. This is a high priority task!';
+        break;
+      case DeadlinePriority.medium:
+        notificationTitle = '⏰ Deadline Reminder';
+        notificationBody = '${deadline.title} is due $timeMessage.';
+        break;
+      case DeadlinePriority.low:
+        notificationTitle = '📝 Low Priority Deadline';
+        notificationBody = 'Reminder: ${deadline.title} is due $timeMessage.';
+        break;
+      case DeadlinePriority.critical:
+     
+        throw UnimplementedError();
+    }
+    
+    await _notificationService.showNotification(
+      id: deadline.hashCode,
+      title: notificationTitle,
+      body: notificationBody,
+      payload: 'deadline_${deadline.id}',
+    );
+  }
+}
