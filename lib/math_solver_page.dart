@@ -1,5 +1,9 @@
 import 'dart:io';
-
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+import '../services/math_solver_service.dart';
+import '../services/text_recognition_service.dart';
 
 class MathSolverPage extends StatefulWidget {
   const MathSolverPage({Key? key}) : super(key: key);
