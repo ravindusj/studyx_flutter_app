@@ -1,79 +1,63 @@
-# StudyX - Study Support Companion
+# StudyX - All-in-One Student Learning Platform
 
 ## About StudyX
-StudyX is a revolutionary comprehensive mobile application that transforms the learning experience for students. By integrating augmented reality, artificial intelligence, and an intuitive user interface, StudyX provides an all-in-one solution that eliminates the need to switch between multiple applications for note-taking, studying, and collaboration.
 
-Built with Dart and Flutter, StudyX delivers optimized and responsive experiences across different devices while focusing on enhancing student productivity and engagement.
+StudyX is a comprehensive mobile application designed to streamline and enhance the learning experience for students. Developed with Flutter and Dart, it combines note-taking, study tools, AI features, and collaboration capabilities in one seamless platform.
+
+In today's information-saturated world, StudyX addresses the challenge of managing scattered study materials by providing an integrated solution that helps students focus on actual learning rather than organizing content.
 
 ## Key Features
 
-### 🖋️ Adaptable Note Taking
-- Rich text formatting options
-- Support for multiple learning styles (text, drawings, multimedia)
-- Customizable templates
-- Tagging and classification
-- Hierarchical organization with nested pages and sections
+### 📝 Note Taking
+- Rich text editor with formatting options
+- Multimedia integration (images, diagrams)
+- Hierarchical organization with tags
 
-### 🧠 AI-Powered Content Processing
-- Automatic summarization of lengthy texts
-- Highlight important points
-- Smart flashcard generation
-- Personalized learning recommendations
-- Natural language processing search
+### 🤖 AI Assistant
+- Text Summarizer
+- YouTube Link Summarizer
+- PDF Summarizer
+- AI-powered content suggestions
 
-### ⚡ Productivity Tools
-- Voice-to-text dictation
-- Task management system
-- To-do lists with priorities
-- Real-time collaboration
-- Progress tracking
-- Deadline Tracker
+### ✅ Task Management
+- To-Do List with priority settings
+- Deadline Tracker with reminders
+- Progress Tracker to visualize achievements
 
-### 👥 Collaborative Features
-- Real-time document sharing and editing
-- Group study sessions
-- File sharing and version control
-- Discussion forums
+### 💬 Collaboration
+- Real-time chat (text, voice messages, calls)
+- Study group creation and management
+- Note sharing
 
-### 🍽️ Campus Life Features
-- Canteen availability tracking
-- Real-time menu updates
+### 🧮 Study Tools
+- Math Solver with step-by-step solutions
+- Canteen Tracker showing real-time menu updates and crowd levels
+
+### 🧘 Wellness
+- Meditation feature with guided sessions
+- Breathing exercises and animations
+- Music options for relaxation or energy boost
 
 ## Tech Stack
-- **Frontend:** Flutter (Dart)
-- **Backend:** Firebase Real-time Database
-- **AI Features:** Gemini API / Google AI APIs, Natural Language Processing
-- **Collaboration:** WebRTC for real-time communication
-- **Authentication:** Firebase Authentication
 
-## Development Methodology
-StudyX is developed using Agile methodology with Scrum practices, focusing on user-centered design and continuous delivery to ensure a scalable, adaptable learning solution.
+- **Frontend:** Flutter/Dart
+- **Backend:** Firebase (Authentication, Realtime Database)
+- **AI Features:** Gemini API, Google AI APIs, NLP
+- **Collaboration:** Firebase Realtime Database
 
 ## Future Implementations
-- AI-powered personalized learning paths
-- Gamification (rewards, leaderboards, challenges)
-- Blockchain-based certification
-- Expanded AR features including virtual lab simulations
-- Multi-language support
-- Integration with educational institutions
 
-## Team Members
-- Widana Manilka (Project Leader)
-- Edirisooriya Alwis
-- Chinthamani Hansanath
-- Dhanuja Mayadunne
-- Udula Mayadunne
-- Munasingha Ranasingha
-- Abeykon Shavinda
-- Ranamukage Thilanka
+- AR 3D modeling for interactive learning experiences
+- VR exploration for virtual world experiences
+- Enhanced AI capabilities for personalized learning
 
-## Individual Contributions
-- **Ravindu:** Note-taking feature development
-- **Udula & Ravindu:** Chat system
-- **Danja:** AI chatbot and summarization feature
-- **Sanka:** Authentication system
-- **Kanishka:** Reminder and to-do list functionality
-- **Udula:** Deadline Tracker
-- **Mevan:** Maths Solver
-- **Shavinda:** Canteen availability tracker
-- **Pahan** Progress Tracker
+## Team Members & Contributions
+
+- **Ravindu** - Note-taking feature
+- **Danuja** - AI chat and summarization feature
+- **Sanka** - Login system and meditation feature
+- **Kanishka** - To-do list function
+- **Udula** - Deadline tracker
+- **Mevan** - Math solver tool
+- **Shavinda** - Canteen availability tracker
+- **Pahan** - Progress tracker
