@@ -1,16 +1,84 @@
-# studyx_app
+# StudyX - Study Support Companion
 
-A new Flutter project.
+## About StudyX
+StudyX is a revolutionary comprehensive mobile application that transforms the learning experience for students. By integrating augmented reality, artificial intelligence, and an intuitive user interface, StudyX provides an all-in-one solution that eliminates the need to switch between multiple applications for note-taking, studying, and collaboration.
 
-## Getting Started
+Built with Dart and Flutter, StudyX delivers optimized and responsive experiences across different devices while focusing on enhancing student productivity and engagement.
 
-This project is a starting point for a Flutter application.
+## Key Features
 
-A few resources to get you started if this is your first Flutter project:
+### 🖋️ Adaptable Note Taking
+- Rich text formatting options
+- Support for multiple learning styles (text, drawings, multimedia)
+- Customizable templates
+- Tagging and classification
+- Hierarchical organization with nested pages and sections
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### 🧠 AI-Powered Content Processing
+- Automatic summarization of lengthy texts
+- Highlight important points
+- Smart flashcard generation
+- Personalized learning recommendations
+- Natural language processing search
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 🔍 Augmented Reality Learning
+- Interactive 3D models
+- Visual simulations for complex concepts
+- Immersive learning experiences
+- Subject-specific AR visualizations
+
+### ⚡ Productivity Tools
+- Voice-to-text dictation
+- Task management system
+- To-do lists with priorities
+- Real-time collaboration
+- Progress tracking
+
+### 👥 Collaborative Features
+- Real-time document sharing and editing
+- Group study sessions
+- File sharing and version control
+- Discussion forums
+
+### 🍽️ Campus Life Features
+- Canteen availability tracking
+- Real-time menu updates
+
+## Tech Stack
+- **Frontend:** Flutter (Dart)
+- **Backend:** Firebase Real-time Database
+- **AI Features:** Gemini API / Google AI APIs, Natural Language Processing
+- **AR Technologies:** ARCore (Android) / ARKit (iOS)
+- **Collaboration:** WebRTC for real-time communication
+- **Authentication:** Firebase Authentication
+
+## Development Methodology
+StudyX is developed using Agile methodology with Scrum practices, focusing on user-centered design and continuous delivery to ensure a scalable, adaptable learning solution.
+
+## Future Implementations
+- AI-powered personalized learning paths
+- Gamification (rewards, leaderboards, challenges)
+- Blockchain-based certification
+- Expanded AR features including virtual lab simulations
+- Multi-language support
+- Integration with educational institutions
+
+## Team Members
+- Widana Manilka (Project Leader)
+- Edirisooriya Alwis
+- Chinthamani Hansanath
+- Dhanuja Mayadunne
+- Udula Mayadunne
+- Munasingha Ranasingha
+- Abeykon Shavinda
+- Ranamukage Thilanka
+
+## Individual Contributions
+- **Ravindu:** Note-taking feature development
+- **Udula & Ravindu:** Chat system
+- **Danja:** AI chatbot and summarization feature
+- **Sanka:** Authentication system
+- **Kanishka:** Reminder and to-do list functionality
+- **Udula:** Augmented reality (AR) features
+- **Mevan:** Progress tracker
+- **Shavinda:** Canteen availability tracker
