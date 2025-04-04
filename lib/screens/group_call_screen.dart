@@ -233,7 +233,7 @@ class _GroupCallScreenState extends State<GroupCallScreen> with SingleTickerProv
           _errorMessage = 'Failed to connect: ${e.toString()}';
         });
         
-        // Show error snackbar
+       
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error connecting to call: $e'))
         );
@@ -241,27 +241,27 @@ class _GroupCallScreenState extends State<GroupCallScreen> with SingleTickerProv
     }
   }
 
-  // Add new method to manage the timer state based on participant count
+  
   void _updateCallTimerState() {
     if (!mounted) return;
     
-    // Count participants excluding the current user
+    
     final otherParticipantsCount = _currentParticipantIds
         .where((id) => id != widget.userId)
         .length;
     
     if (otherParticipantsCount > 0 && !_isTimerRunning) {
-      // Start timer when others join and timer isn't already running
+     
       _handleStatusUpdate("Starting call timer - others have joined");
       _startCallTimer();
     } else if (otherParticipantsCount == 0 && _isTimerRunning) {
-      // Stop timer when everyone else leaves
+     
       _handleStatusUpdate("Pausing call timer - nobody else in call");
       _stopCallTimer();
     }
   }
   
-  // Method to start the call timer
+  
   void _startCallTimer() {
     setState(() {
       _callStartTime = DateTime.now();
