@@ -73,5 +73,6 @@ StudyX is developed using Agile methodology with Scrum practices, focusing on us
 - **Sanka:** Authentication system
 - **Kanishka:** Reminder and to-do list functionality
 - **Udula:** Deadline Tracker
-- **Mevan:** Progress tracker
+- **Mevan:** Maths Solver
 - **Shavinda:** Canteen availability tracker
+- **Pahan** Progress Tracker
