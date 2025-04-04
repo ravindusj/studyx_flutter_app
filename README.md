@@ -1,4 +1,4 @@
-# StudyX - All-in-One Student Learning Platform
+# StudyX - All-in-One Student Study Companion
 
 ## About StudyX
 
