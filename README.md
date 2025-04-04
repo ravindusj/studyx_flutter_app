@@ -42,7 +42,6 @@ Built with Dart and Flutter, StudyX delivers optimized and responsive experience
 - **Frontend:** Flutter (Dart)
 - **Backend:** Firebase Real-time Database
 - **AI Features:** Gemini API / Google AI APIs, Natural Language Processing
-- **AR Technologies:** ARCore (Android) / ARKit (iOS)
 - **Collaboration:** WebRTC for real-time communication
 - **Authentication:** Firebase Authentication
 
@@ -73,6 +72,6 @@ StudyX is developed using Agile methodology with Scrum practices, focusing on us
 - **Danja:** AI chatbot and summarization feature
 - **Sanka:** Authentication system
 - **Kanishka:** Reminder and to-do list functionality
-- **Udula:** Augmented reality (AR) features
+- **Udula:** Deadline Tracker
 - **Mevan:** Progress tracker
 - **Shavinda:** Canteen availability tracker
