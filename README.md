@@ -21,12 +21,6 @@ Built with Dart and Flutter, StudyX delivers optimized and responsive experience
 - Personalized learning recommendations
 - Natural language processing search
 
-### 🔍 Augmented Reality Learning
-- Interactive 3D models
-- Visual simulations for complex concepts
-- Immersive learning experiences
-- Subject-specific AR visualizations
-
 ### ⚡ Productivity Tools
 - Voice-to-text dictation
 - Task management system
