@@ -27,6 +27,7 @@ Built with Dart and Flutter, StudyX delivers optimized and responsive experience
 - To-do lists with priorities
 - Real-time collaboration
 - Progress tracking
+- Deadline Tracker
 
 ### 👥 Collaborative Features
 - Real-time document sharing and editing
